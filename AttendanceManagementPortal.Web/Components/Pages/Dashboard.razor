@@ -1,0 +1,39 @@
+﻿@page "/Dashboard"
+@inherits DashboardBase;
+
+<h3>Dashboard</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Employee Name</th>
+            <th scope="col">Employee Code</th>
+            <th scope="col">Check In</th>
+            <th scope="col">Check Out</th>
+            <th scope="col">Date</th>
+            <th scope="col">Location</th>
+            <th scope="col">Attendance</th>
+        </tr>
+    </thead>
+    @if (EmployeeAttendances != null )
+    {
+        <tbody>
+            @foreach(var attend in EmployeeAttendances)
+            {
+                <tr>
+
+                    <th scope="row">@attend.ID</th>
+                    <td>@(attend.Employee.FullName ?? "N/A")</td>
+                    <td>@(attend.Employee?.Code ?? "N/A")</td>
+                    <td>@attend.CheckIn</td>
+                    <td>@attend.CheckOut</td>
+                    <td>@attend.Date.ToShortDateString()</td>
+                    <td>Gurgaon</td>
+                    <td>Present</td>
+                </tr>
+            }
+        </tbody>
+    }
+    
+</table>
