@@ -10,7 +10,7 @@ namespace AttendanceManagementPortal.Model
     {
         public int ID { get; set; }
         public DateTime Date { get; set; } = DateTime.Today;
-        public TimeSpan Time { get; set; } = DateTime.Now.TimeOfDay;
+        public DateTime Time { get; set; } = DateTime.Now;
         public string Type { get; set; } = string.Empty;
         public int EmployeeID { get; set; }
         public Employee Employee { get; set; }
