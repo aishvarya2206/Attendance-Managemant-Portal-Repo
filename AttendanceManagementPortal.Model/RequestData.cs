@@ -8,7 +8,7 @@ namespace AttendanceManagementPortal.Model
 {
     public class RequestData
     {
-        public string WifiSsid { get; set; } = string.Empty;
+        public string? WifiSsid { get; set; }
         public string IpAddress { get; set; } = string.Empty;
     }
 }
