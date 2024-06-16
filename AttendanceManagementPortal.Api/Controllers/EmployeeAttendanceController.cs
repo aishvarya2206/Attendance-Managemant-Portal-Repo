@@ -20,7 +20,20 @@ namespace AttendanceManagementPortal.Api.Controllers
         {
             try
             {
-                var result = await _employeeAttendanceRepository.GetAttendances();
+                var result = await _employeeAttendanceRepository.GetEmployeeAttendance();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error in retrieving database");
+            }
+        }
+        [HttpPost]
+        public async Task<ActionResult> CreateEmployeeAttendance(EmployeeAttendance employeeAttendance)
+        {
+            try
+            {
+                var result = await _employeeAttendanceRepository.CreateEmployeeAttendance(employeeAttendance);
                 return Ok(result);
             }
             catch (Exception)

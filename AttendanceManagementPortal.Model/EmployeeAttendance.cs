@@ -16,6 +16,9 @@ namespace AttendanceManagementPortal.Model
         public DateTime Date { get; set; } = DateTime.Now;
         public int EmployeeID { get; set; }
         public Employee Employee { get; set; }
+        [NotMapped]
+        public string Location { get; set; }
+       
         
 
     }

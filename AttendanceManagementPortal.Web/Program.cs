@@ -22,6 +22,14 @@ builder.Services.AddHttpClient<IEmployeeService, EmployeeService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7095/");
 });
+builder.Services.AddHttpClient<IEmployeeAttendanceService, EmployeeAttendanceService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7095/");
+});
+builder.Services.AddHttpClient<IDepartmentService, DepartmentService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7095/");
+});
 
 ///--------------------------
 

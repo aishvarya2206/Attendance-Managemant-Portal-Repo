@@ -7,12 +7,13 @@ namespace AttendanceManagementPortal.Web.Components.Pages
     public class DashboardBase : ComponentBase
     {
         [Inject]
-        public required IEmployeeService EmployeeService { get; set; }
+        public required IEmployeeAttendanceService EmployeeAttendanceService { get; set; }
         public required IEnumerable<EmployeeAttendance> EmployeeAttendances { get; set; }
+        public AttendanceLog? empLocation { get; set; } = new();
         
         protected override async Task OnInitializedAsync()
         {
-            EmployeeAttendances = (await EmployeeService.GetEmployeeAttendance()).ToList();
+           EmployeeAttendances = (await EmployeeAttendanceService.GetEmployeeAttendance()).ToList();
 
         }
 
