@@ -20,9 +20,12 @@ builder.Services.AddSwaggerGen();
 // Database connection added ----------
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("AttendanceConString")));
-builder.Services.AddScoped<IEmployeeRepository , EmployeeRepository>();
-builder.Services.AddScoped<IEmployeeAttendanceRepository, EmployeeAttendanceRepository>();
+builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+builder.Services.AddScoped<IEmployeeAttendanceRepository, EmployeeAttendanceRepository>();
+builder.Services.AddScoped<IEmployeeRepository , EmployeeRepository>();
+builder.Services.AddScoped<IValidWifiRepository, ValidWifiRepository>();
+
 
 builder.Services.AddLogging(logging =>
 {

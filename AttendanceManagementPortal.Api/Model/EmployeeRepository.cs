@@ -29,7 +29,7 @@ namespace AttendanceManagementPortal.Api.Model
                 .FirstOrDefaultAsync(e => e.ID == employeeId);
         }
 
-        public async Task<EmployeeAttendance?> MarkAttendances([FromForm] RequestData requestData)
+        /*public async Task<EmployeeAttendance?> MarkAttendances([FromForm] RequestData requestData)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace AttendanceManagementPortal.Api.Model
                 Console.WriteLine("Stack Trace: {0}", e.StackTrace);
                 throw;
             }
-        }
+        }*/
 
         public async Task<Employee> CreateEmployee(Employee employee)
         {
@@ -79,6 +79,11 @@ namespace AttendanceManagementPortal.Api.Model
                 Console.WriteLine("Stack Trace: {0}", e.StackTrace);
                 throw;
             }
+        }
+
+        public Task<EmployeeAttendance?> MarkAttendances([FromForm] RequestData requestData)
+        {
+            throw new NotImplementedException();
         }
     }
 }

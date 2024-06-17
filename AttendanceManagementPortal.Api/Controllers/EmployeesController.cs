@@ -29,20 +29,12 @@ namespace AttendanceManagementPortal.Api.Controllers
             }
 
         }
-        
-        // Method - POST
         [HttpPost]
-        public async Task<ActionResult> MarkAttendance([FromForm] RequestData requestData)
+        public async Task<ActionResult> Create([FromForm] Employee requestData)
         {
             try
             {
-                var result = await _employeeRepository.MarkAttendances(requestData);
-                var response = new
-                {
-                    Success = true,
-                    Message = $"User {requestData.WifiSsid} created successfully!",
-                    Code = StatusCodes.Status200OK
-                };
+                var result = await _employeeRepository.CreateEmployee(requestData);
                 return Ok(result);
             }
             catch (Exception)
@@ -50,6 +42,8 @@ namespace AttendanceManagementPortal.Api.Controllers
                 return StatusCode(500, "Error in retrieving database");
             }
         }
+
+       
 
     }
 }

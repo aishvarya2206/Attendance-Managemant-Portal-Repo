@@ -9,9 +9,9 @@ namespace AttendanceManagementPortal.Web.Services
         {
             _httpClient = httpClient;
         }
-        public async Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendance()
+        public async Task<IEnumerable<Employee>> GetEmployee()
         {
-            var result =  await _httpClient.GetFromJsonAsync<EmployeeAttendance[]>($"api/EmployeeAttendance");
+            var result =  await _httpClient.GetFromJsonAsync<Employee[]>($"api/Employees");
             return result;
         }
     }

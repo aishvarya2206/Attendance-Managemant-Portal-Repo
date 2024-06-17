@@ -4,6 +4,6 @@ namespace AttendanceManagementPortal.Web.Services
 {
     public interface IEmployeeService
     {
-        Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendance();
+        Task<IEnumerable<Employee>> GetEmployee();
     }
 }
