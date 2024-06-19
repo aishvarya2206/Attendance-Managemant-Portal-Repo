@@ -1,5 +1,7 @@
-﻿@page "/Dashboard"
+﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
 @inherits DashboardBase;
+@attribute [Authorize]
 
 <h3>Dashboard</h3>
 
