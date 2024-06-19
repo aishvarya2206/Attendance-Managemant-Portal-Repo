@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http;
+using AttendanceManagementPortal.Biometrics.BiometricSQL;
 
 
 namespace AttendanceManagementPortal.Biometrics
@@ -19,61 +20,43 @@ namespace AttendanceManagementPortal.Biometrics
         {
             IConfiguration configuration = new ConfigurationBuilder()
              .SetBasePath(Directory.GetCurrentDirectory())
-             .AddJsonFile("C:\\Users\\khuwa\\source\\repos\\Attendance-Managemant-Portal-Repo\\AttendanceManagementPortal.Biometrics\\appsettings.json", optional: false, reloadOnChange: true)
+             .AddJsonFile($"{AppDomain.CurrentDomain.BaseDirectory}\\appsettings.json", optional: false, reloadOnChange: true)
              .Build();
 
             // Read the file path from the configuration
             string csvFilePath = configuration.GetSection("csvFilePath").Value;
+            // auto load every 10 min
+            var startTimeSpan = TimeSpan.Zero;
+            var periodTimeSpan = TimeSpan.FromMinutes(10);
 
-            // Check if the file exists and has a .csv extension
-            if (File.Exists(csvFilePath) && Path.GetExtension(csvFilePath).Equals(".csv", StringComparison.OrdinalIgnoreCase))
+            var timer = new System.Threading.Timer((e) =>
             {
-                // Load the CSV file
-                var records = ReadCsvFile(csvFilePath);
-
-                // Process the biometric data records
-                foreach (var record in records)
+                // csv read and upload into database
+                // Check if the file exists and has a .csv extension
+                if (File.Exists(csvFilePath) && Path.GetExtension(csvFilePath).Equals(".csv", StringComparison.OrdinalIgnoreCase))
                 {
-                    Console.WriteLine($"Employee ID: {record.Employee_ID}, Employee Name: {record.Employee_FullName}, DateTime IN: {record.DateTime_IN}, DateTime OUT: {record.DateTime_OUT}");
-                    // datbase send using form data 
-                    var _httpClient = new HttpClient();
-                    _httpClient.BaseAddress = new Uri("https://localhost:7095/api/AttendanceLog");
-                    var formContent = new FormUrlEncodedContent(
-                        new[]
-                        {
-                            new KeyValuePair<string, string>("Date" , DateTime.Today.ToString()),
-                            new KeyValuePair<string, string>("Time" , DateTime.Now.ToLongDateString()),
-                            new KeyValuePair<string, string>("Type" , "In"),
-                            new KeyValuePair<string, string>("EmployeeId" , record.Employee_ID.ToString()),
-                            new KeyValuePair<string, string>("Source","")
+                    // Load the CSV file
+                    var records = ReadCsvFile(csvFilePath);
 
-                        }
-                        );
-                        try
-                        {
-                            var response = _httpClient.PostAsync("",formContent).Result;
-                            if (response.IsSuccessStatusCode)
-                            {
-                                Console.WriteLine("saved successfully");
-                            }
-                            else
-                            {
-                                Console.WriteLine("Error : " + response.StatusCode);
-                            }
-                        }
-                        catch( Exception ex ) 
-                        {
-                            throw new Exception(ex.Message);
-                        }
-
-                    // db send stop
-
+                    // Process the biometric data records
+                    foreach (var record in records)
+                    {
+                        Console.WriteLine($"Date: {record.Date}, Time: {record.Time}, Type: {record.Type}, Employee ID: {record.EmployeeID} ,Source: {record.Source}");
+                        var biometricSQL = new biometricSQL(configuration);
+                        biometricSQL.InsertBiometricRecord(record);
+                    }
                 }
-            }
-            else
-            {
-                Console.WriteLine("The specified file does not exist or has an incorrect extension.");
-            }
+                else
+                {
+                    Console.WriteLine("The specified file does not exist or has an incorrect extension.");
+                }
+                // csv upload ends
+
+
+            }, null, startTimeSpan, periodTimeSpan);
+
+           
+            // auto load end
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadLine();
@@ -85,7 +68,7 @@ namespace AttendanceManagementPortal.Biometrics
             {
                 HasHeaderRecord = true,
             };
-
+             
             var records = new List<BiometricRecord>();
 
             try

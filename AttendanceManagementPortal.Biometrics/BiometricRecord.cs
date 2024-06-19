@@ -8,12 +8,11 @@ namespace AttendanceManagementPortal.Biometrics
 {
     public class BiometricRecord
     {
-        public int Employee_ID { get; set; }
-        public string Employee_FullName { get; set; }
-        public string Employee_UserName { get; set; }
-        public int Department_ID { get; set; }
-        public string Department { get; set; }
-        public TimeSpan DateTime_IN { get; set; }
-        public TimeSpan DateTime_OUT { get; set; }
+        public DateTime Date { get; set; } = DateTime.Today;
+        public DateTime Time { get; set; } = DateTime.Now;
+        public string Type { get; set; } = string.Empty;
+        public int EmployeeID { get; set; }
+        public string Source { get; set; } = string.Empty;
+        
     }
 }
