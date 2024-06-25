@@ -85,5 +85,16 @@ namespace AttendanceManagementPortal.Api.Model
         {
             throw new NotImplementedException();
         }
+
+        public async Task<bool> CheckEmailAvailabile(string email)
+        {
+            var result = await _appDbContext.Employees
+                .FirstOrDefaultAsync(e => e.UserName == email);
+            if (result != null)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using AttendanceManagementPortal.Model;
+using AttendanceManagementPortal.Web.Data;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 

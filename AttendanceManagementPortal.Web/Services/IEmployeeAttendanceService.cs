@@ -6,5 +6,6 @@ namespace AttendanceManagementPortal.Web.Services
     {
         Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendance();
         Task<AttendanceLog> GetAttendanceByEmployeeIdLastUpdate(int empid);
+        Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendanceForEmployee(string email);
     }
 }

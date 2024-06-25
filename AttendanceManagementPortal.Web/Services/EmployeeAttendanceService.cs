@@ -21,5 +21,11 @@ namespace AttendanceManagementPortal.Web.Services
             var result = await _httpClient.GetFromJsonAsync<EmployeeAttendance[]>($"api/EmployeeAttendance");
             return result;
         }
+
+        public async Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendanceForEmployee(string email)
+        {
+            var result = await _httpClient.GetFromJsonAsync<EmployeeAttendance[]>($"api/EmployeeAttendance/EmployeeAttendanceForEmployee/{email}");
+            return result;
+        }
     }
 }
