@@ -23,8 +23,8 @@ namespace AttendanceManagementPortal.Biometrics.BiometricSQL
                 using (SqlConnection con = new SqlConnection(_connectionString))
                 {
                     SqlCommand cmd = new SqlCommand();
-                    
-                    cmd.CommandText = $"INSERT INTO [AttendanceManagementPortalDb].[dbo].[AttendanceLogs] ([Date], [Time], [Type], [EmployeeID], [Source]) VALUES ('{record.Date.ToString()}', '{record.Time.ToString()}', '{record.Type.ToString()}', '{record.EmployeeID}', '')";
+                    // mantaining attendance log everytime
+                    cmd.CommandText = $"INSERT INTO [AttendanceManagementPortalDb].[dbo].[AttendanceLogs] ([Date], [Time], [Type], [EmployeeID], [Source]) VALUES (cast('{record.Date.ToString("yyyy-MM-dd HH:mm:ss")}'as datetime), cast('{record.Time.ToString("yyyy-MM-dd HH:mm:ss")}'as datetime), '{record.Type.ToString()}', '{record.EmployeeID}', '')";
                     
                     try
                     {
@@ -35,16 +35,47 @@ namespace AttendanceManagementPortal.Biometrics.BiometricSQL
                         if(TotalRowsAffected > 0 )
                         {
                             SqlCommand cmdforempattend = new SqlCommand();
-                            cmdforempattend.CommandText = $"Select * from [AttendanceManagementPortalDb].[dbo].[EmployeesAttendances] where [Date] = '{DateTime.Today}' and [EmployeeID] = {record.EmployeeID}";
+                            cmdforempattend.CommandText = $"Select * from [AttendanceManagementPortalDb].[dbo].[EmployeesAttendances] where [Date] = cast('{DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss")}'as datetime) and [EmployeeID] = {record.EmployeeID}";
                             cmdforempattend.Connection = con;
-                            
-                            int AttendFound = cmdforempattend.ExecuteNonQuery();
+                            // get number of rows found 
+                            int AttendFound;
+                            using (SqlDataReader reader = cmdforempattend.ExecuteReader())
+                            {
+                                int rowCount = 0;
+                                while (reader.Read())
+                                {
+                                    rowCount++;
+                                }
+
+                                // rowCount will contain the number of rows found
+                                AttendFound = rowCount;
+                            }
+
+                            //int AttendFound = cmdforempattend.ExecuteNonQuery();
+                            // if employee attendance does not exist 
                             if (AttendFound <= 0)
                             {
                                 SqlCommand attendcreate = new SqlCommand();
-                                attendcreate.CommandText = $"INSERT INTO [AttendanceManagementPortalDb].[dbo].[EmployeesAttendances] ([CheckIn], [CheckOut], [Date], [EmployeeID]) VALUES ('{record.Time.ToString()}', '{record.Time.ToString()}', '{record.Date}', {record.EmployeeID})";
+                                
+                                attendcreate.CommandText = $"INSERT INTO [AttendanceManagementPortalDb].[dbo].[EmployeesAttendances] ([CheckIn], [CheckOut], [Date], [EmployeeID]) VALUES ('{record.Time.ToString("HH:mm:ss")}', '', cast('{record.Date.ToString("yyyy-MM-dd HH:mm:ss")}'as datetime), {record.EmployeeID})";
+                               
                                 attendcreate.Connection = con;
                                 int AttendCreate = attendcreate.ExecuteNonQuery();
+                            }
+                            // if employee attendance already exist
+                            else
+                            {
+                                // if TYPE is OUT then update checkout time
+                                Console.WriteLine(record.Type.ToUpper());
+                                if (record.Type.ToUpper() == "OUT")
+                                {
+                                    SqlCommand attendcreate = new SqlCommand();
+
+                                    attendcreate.CommandText = $"UPDATE [AttendanceManagementPortalDb].[dbo].[EmployeesAttendances] SET [CheckOut] = '{record.Time.ToString("HH:mm:ss")}' WHERE [EmployeeID] = {record.EmployeeID} and [Date] = cast('2024-06-27 00:00:00'as datetime)";
+
+                                    attendcreate.Connection = con;
+                                    int AttendCreate = attendcreate.ExecuteNonQuery();
+                                }
                             }
                         }
                     }
