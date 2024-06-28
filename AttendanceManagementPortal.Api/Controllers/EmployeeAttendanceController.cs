@@ -28,6 +28,19 @@ namespace AttendanceManagementPortal.Api.Controllers
                 return StatusCode(500, "Error in retrieving database");
             }
         }
+        [HttpGet("EmployeeAttendanceForEmployee/{email}")]
+        public async Task<ActionResult> GetEmployeeAttendanceForEmployee(string email)
+        {
+            try
+            {
+                var result = await _employeeAttendanceRepository.GetEmployeeAttendanceForEmployee(email);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error in retrieving database");
+            }
+        }
         [HttpPost]
         public async Task<ActionResult> CreateEmployeeAttendance(EmployeeAttendance employeeAttendance)
         {
@@ -41,5 +54,38 @@ namespace AttendanceManagementPortal.Api.Controllers
                 return StatusCode(500, "Error in retrieving database");
             }
         }
+        [HttpGet("GetEmployeeAttendanceByEmployeeId/{employeeid}")]
+        public async Task<ActionResult> GetEmployeeAttendanceByEmployeeId(int employeeid)
+        {
+            try
+            {
+                var result = await _employeeAttendanceRepository.GetEmployeeAttendanceByEmployeeId(employeeid);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error in retrieving database");
+            }
+        }
+        /// <summary>
+        /// Biometric data dashboard reflect
+        /// </summary>
+        /// <returns></returns>
+        //[Route("api/EmployeeAttendance/GetEmployeeAttendanceFromBiometric")]
+        [HttpGet("GetEmployeeAttendanceFromBiometric")]
+        public async Task<ActionResult> GetEmployeeAttendanceFromBiometric()
+        {
+            try
+            {
+                var result = await _employeeAttendanceRepository.GetEmployeeAttendanceFromBiometric();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error in retrieving database");
+            }
+        }
+
+
     }
 }

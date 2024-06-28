@@ -8,6 +8,8 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using AttendanceManagementPortal.Web.Data
 @using AttendanceManagementPortal.Model
+@using System.Net.NetworkInformation
+@using System.Net
 
 
 @inject UserManager<ApplicationUser> UserManager
@@ -31,7 +33,7 @@
             <hr />
             <ValidationSummary class="text-danger" role="alert" />
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="Enter email address" />
+                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="email" aria-required="true" placeholder="Enter email address" />
                 <label for="email">Email</label>
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
             </div>
@@ -58,25 +60,23 @@
                 <ValidationMessage For="() => Input.Code" class="text-danger" />
             </div>
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="Enter the user name" />
-                <label for="username">User Name</label>
-                <ValidationMessage For="() => Input.UserName" class="text-danger" />
-            </div>
-
-            @* <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.IpAddress" class="form-control" autocomplete="ipaddress" aria-required="true" placeholder="abc.abc.abc.abc" />
-                <label for="fullname">IpAddress</label>
-                <ValidationMessage For="() => Input.IpAddress" class="text-danger" />
-            </div> *@
-            @* <div class="form-floating mb-3">
-                <label class="small mb-1" for="inputDepartment">Department</label>
-                <InputSelect class="form-control" id="inputDepartment" @bind-Value="Input.DepartmentId">
+                
+                <InputSelect class="form-select" id="inputDepartment" @bind-Value="Input.DepartmentId">
+                    <option>Select Department</option>
                     @foreach (var dept in Department)
                     {
                         <option value="@dept.ID">@dept.Name</option>
                     }
                 </InputSelect>
+                <ValidationMessage For="() => Input.DepartmentId" class="text-danger" />
+                
+            </div>
+           @*  <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="Enter the email address" />
+                <label for="username">Email Address</label>
+                <ValidationMessage For="() => Input.UserName" class="text-danger" />
             </div> *@
+
 
             @*-----------------ends-------------------*@
 
@@ -84,13 +84,7 @@
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </EditForm>
     </div>
-    @* <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            <ExternalLoginPicker />
-        </section>
-    </div> *@
+    
 </div>
 
 @code {
@@ -103,36 +97,71 @@
     private string? ReturnUrl { get; set; }
 
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
-    @* --------custom added code --------
+    @* --------custom added code -------- *@
 
     public required List<Department> Department { get; set; } = new List<Department>();
     [Inject]
     public required IDepartmentService DepartmentService { get; set; }
-
+    
+    string ipAddress = "";
     protected override async Task OnInitializedAsync()
     {
         Department = (await DepartmentService.GetDepartment()).ToList();
-        
+        // To find IPAddress
+        var local = NetworkInterface.GetAllNetworkInterfaces().Where(i => i.Name == "Local Area Connection").FirstOrDefault();
+        var stringAddress = local.GetIPProperties().UnicastAddresses[0].Address.ToString();
+        ipAddress = IPAddress.Parse(stringAddress).ToString();
     }
 
-    -----------------------------------*@
+    @* -----------------------------------*@
+    public Department department { get; set; } = new();
     public async Task RegisterUser(EditContext editContext)
     {
+        Input.UserName = Input.Email;
         @*--------custom added code --------*@
+
         var formContent = new FormUrlEncodedContent(new[]
-        {
+                                    {
             new KeyValuePair<string, string>("FullName", Input.FullName),
             new KeyValuePair<string, string>("Code", Input.Code),
-            new KeyValuePair<string, string>("UserName", Input.UserName),
-            new KeyValuePair<string, string>("DeviceIPAddress", "fe80::428d:cba:b00a:7832%20")
-            
+            new KeyValuePair<string, string>("UserName", Input.Email),
+            new KeyValuePair<string, string>("DepartmentId", Input.DepartmentId),
+            new KeyValuePair<string, string>("DeviceIPAddress",ipAddress),
+            new KeyValuePair<string, string>("Department", Input.DepartmentId)
+
         });
-        var httpClient = new HttpClient();
-        httpClient.BaseAddress = new Uri("https://localhost:7095/api/EmployeeCreate/");
-        var response = httpClient.PostAsync("", formContent).Result;
+        using (var httpClient = new HttpClient())
+        {
+            httpClient.BaseAddress = new Uri("https://localhost:7095/api/Employees/");
+            try
+            {
+                var response = httpClient.PostAsync("", formContent).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Employee Created Successfully");
+                }
+                else
+                {
+                    var responseContent = response.Content.ReadAsStringAsync().Result;
+                    Console.WriteLine($"Error: {response.StatusCode}");
+                    Console.WriteLine($"Response Content: {responseContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
+        }
+      
         @*-------------------------------------------*@
 
         var user = CreateUser();
+       //user.UserName = Input.Email;
+       // user.FullName = Input.FullName;
+       // user.Code = Input.Code;
+       // user.DepartmentId = Input.DepartmentId;
+        //user.Email = Input.Email;
+
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
@@ -218,17 +247,11 @@
         [Display(Name = "Code")]
         public string Code { get; set; } = "";
 
-        [DataType(DataType.Text)]
-        [Display(Name = "User Name")]
         public string UserName { get; set; } = "";
 
-        [DataType(DataType.Text)]
-        [Display(Name = "DeviceIPAddress")]
-        public string DeviceIPAddress { get; set; } = "";
-
-        [DataType(DataType.Text)]
-        [Display(Name = "DepartmentId")]
-        public string DepartmentId { get; set; } = "";
+        
+        [Display(Name = "Department")]
+        public string DepartmentId { get; set; }
 
         @*-----------------ends-------------------*@
     }

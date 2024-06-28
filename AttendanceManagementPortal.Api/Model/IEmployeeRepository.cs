@@ -9,7 +9,9 @@ namespace AttendanceManagementPortal.Api.Model
         public Task<Employee?> GetEmployee(int employeeId);
         public Task<EmployeeAttendance?> MarkAttendances([FromForm] RequestData requestData);
         public Task<Employee> CreateEmployee(Employee employee);
-        
+        Task<bool> CheckEmailAvailabile(string email);
+
+
 
 
     }

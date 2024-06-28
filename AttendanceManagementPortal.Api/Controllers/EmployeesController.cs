@@ -42,8 +42,22 @@ namespace AttendanceManagementPortal.Api.Controllers
                 return StatusCode(500, "Error in retrieving database");
             }
         }
+        [HttpGet("check/{email}")]
+        public async Task<bool> CheckEmailAvailabile(string email)
+        {
+            try
+            {
+                bool result = await _employeeRepository.CheckEmailAvailabile(email);
+                return result;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
 
-       
+        }
+
+
 
     }
 }
