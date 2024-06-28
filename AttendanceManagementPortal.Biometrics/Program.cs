@@ -87,5 +87,8 @@ namespace AttendanceManagementPortal.Biometrics
 
             return records;
         }
+
+
+        
     }
 }

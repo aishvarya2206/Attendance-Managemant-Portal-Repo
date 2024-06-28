@@ -13,7 +13,7 @@ namespace AttendanceManagementPortal.Web.Components.Pages
         
         protected override async Task OnInitializedAsync()
         {
-           EmployeeAttendances = (await EmployeeAttendanceService.GetEmployeeAttendance()).ToList();
+           EmployeeAttendances = (await EmployeeAttendanceService.GetEmployeeAttendanceFromBiometric()).ToList();
 
         }
 

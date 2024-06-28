@@ -14,5 +14,7 @@ namespace AttendanceManagementPortal.Web.Services
             var result =  await _httpClient.GetFromJsonAsync<Employee[]>($"api/Employees");
             return result;
         }
+
+      
     }
 }
