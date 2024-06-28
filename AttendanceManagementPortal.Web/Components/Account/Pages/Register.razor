@@ -1,0 +1,258 @@
+﻿@page "/Account/Register"
+
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using AttendanceManagementPortal.Web.Services
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
+@using AttendanceManagementPortal.Web.Data
+@using AttendanceManagementPortal.Model
+@using System.Net.NetworkInformation
+@using System.Net
+
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IEmailSender<ApplicationUser> EmailSender
+@inject ILogger<Register> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>Register</PageTitle>
+
+<h1>Register</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <StatusMessage Message="@Message" />
+        <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+            <DataAnnotationsValidator />
+            <h2>Create a new account.</h2>
+            <hr />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="email" aria-required="true" placeholder="Enter email address" />
+                <label for="email">Email</label>
+                <ValidationMessage For="() => Input.Email" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Enter password" />
+                <label for="password">Password</label>
+                <ValidationMessage For="() => Input.Password" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Re-enter password" />
+                <label for="confirm-password">Confirm Password</label>
+                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+            </div>
+            @* -------Custom Added fields start----- *@
+
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.FullName" class="form-control" autocomplete="fullname" aria-required="true" placeholder="Enter your full name" />
+                <label for="fullname">Full Name</label>
+                <ValidationMessage For="() => Input.FullName" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Code" class="form-control" autocomplete="code" aria-required="true" placeholder="Enter your employee code" />
+                <label for="fullname">Employee Code</label>
+                <ValidationMessage For="() => Input.Code" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                
+                <InputSelect class="form-select" id="inputDepartment" @bind-Value="Input.DepartmentId">
+                    <option>Select Department</option>
+                    @foreach (var dept in Department)
+                    {
+                        <option value="@dept.ID">@dept.Name</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Input.DepartmentId" class="text-danger" />
+                
+            </div>
+           @*  <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="Enter the email address" />
+                <label for="username">Email Address</label>
+                <ValidationMessage For="() => Input.UserName" class="text-danger" />
+            </div> *@
+
+
+            @*-----------------ends-------------------*@
+
+
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+        </EditForm>
+    </div>
+    
+</div>
+
+@code {
+    private IEnumerable<IdentityError>? identityErrors;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+    @* --------custom added code -------- *@
+
+    public required List<Department> Department { get; set; } = new List<Department>();
+    [Inject]
+    public required IDepartmentService DepartmentService { get; set; }
+    
+    string ipAddress = "";
+    protected override async Task OnInitializedAsync()
+    {
+        Department = (await DepartmentService.GetDepartment()).ToList();
+        // To find IPAddress
+        var local = NetworkInterface.GetAllNetworkInterfaces().Where(i => i.Name == "Local Area Connection").FirstOrDefault();
+        var stringAddress = local.GetIPProperties().UnicastAddresses[0].Address.ToString();
+        ipAddress = IPAddress.Parse(stringAddress).ToString();
+    }
+
+    @* -----------------------------------*@
+    public Department department { get; set; } = new();
+    public async Task RegisterUser(EditContext editContext)
+    {
+        Input.UserName = Input.Email;
+        @*--------custom added code --------*@
+
+        var formContent = new FormUrlEncodedContent(new[]
+                                    {
+            new KeyValuePair<string, string>("FullName", Input.FullName),
+            new KeyValuePair<string, string>("Code", Input.Code),
+            new KeyValuePair<string, string>("UserName", Input.Email),
+            new KeyValuePair<string, string>("DepartmentId", Input.DepartmentId),
+            new KeyValuePair<string, string>("DeviceIPAddress",ipAddress),
+            new KeyValuePair<string, string>("Department", Input.DepartmentId)
+
+        });
+        using (var httpClient = new HttpClient())
+        {
+            httpClient.BaseAddress = new Uri("https://localhost:7095/api/Employees/");
+            try
+            {
+                var response = httpClient.PostAsync("", formContent).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Employee Created Successfully");
+                }
+                else
+                {
+                    var responseContent = response.Content.ReadAsStringAsync().Result;
+                    Console.WriteLine($"Error: {response.StatusCode}");
+                    Console.WriteLine($"Response Content: {responseContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
+        }
+      
+        @*-------------------------------------------*@
+
+        var user = CreateUser();
+       //user.UserName = Input.Email;
+       // user.FullName = Input.FullName;
+       // user.Code = Input.Code;
+       // user.DepartmentId = Input.DepartmentId;
+        //user.Email = Input.Email;
+
+
+        await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+        var emailStore = GetEmailStore();
+        await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+        var result = await UserManager.CreateAsync(user, Input.Password);
+
+        if (!result.Succeeded)
+        {
+            identityErrors = result.Errors;
+            return;
+        }
+
+        Logger.LogInformation("User created a new account with password.");
+
+        var userId = await UserManager.GetUserIdAsync(user);
+        var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+        var callbackUrl = NavigationManager.GetUriWithQueryParameters(
+            NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
+            new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+
+        await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+
+        if (UserManager.Options.SignIn.RequireConfirmedAccount)
+        {
+            RedirectManager.RedirectTo(
+                "Account/RegisterConfirmation",
+                new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+        }
+
+        await SignInManager.SignInAsync(user, isPersistent: false);
+        RedirectManager.RedirectTo(ReturnUrl);
+    }
+
+    private ApplicationUser CreateUser()
+    {
+        try
+        {
+
+            return Activator.CreateInstance<ApplicationUser>();
+        }
+        catch
+        {
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+        }
+    }
+
+    private IUserEmailStore<ApplicationUser> GetEmailStore()
+    {
+        if (!UserManager.SupportsUserEmail)
+        {
+            throw new NotSupportedException("The default UI requires a user store with email support.");
+        }
+        return (IUserEmailStore<ApplicationUser>)UserStore;
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; } = "";
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = "";
+
+        @* -------Custom Added fields start----- *@
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Full Name")]
+        public string FullName { get; set; } = "";
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Code")]
+        public string Code { get; set; } = "";
+
+        public string UserName { get; set; } = "";
+
+        
+        [Display(Name = "Department")]
+        public string DepartmentId { get; set; }
+
+        @*-----------------ends-------------------*@
+    }
+}
