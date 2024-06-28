@@ -34,5 +34,11 @@ namespace AttendanceManagementPortal.Web.Services
             var result = await _httpClient.GetFromJsonAsync<EmployeeAttendance[]>($"api/EmployeeAttendance/EmployeeAttendanceForEmployee/{email}");
             return result;
         }
+        public async Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendanceFromBiometric()
+        {
+            var result = await _httpClient.GetFromJsonAsync<EmployeeAttendance[]>($"api/EmployeeAttendance/GetEmployeeAttendanceFromBiometric");
+            return result;
+        }
+
     }
 }

@@ -1,0 +1,37 @@
+﻿@page "/employeelist"
+@inherits EmployeeListBase
+
+<h3>EmployeeList</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            
+            <th scope="col">Full Name</th>
+            <th scope="col">Code</th>
+           
+            <th scope="col">Department</th>
+           
+        </tr>
+    </thead>
+    @if (Employees != null)
+    {
+        var count = 1;
+        <tbody>
+            @foreach (var employee in Employees)
+            {
+                <tr>
+                    <th scope="row">@count</th>
+               
+                    <td>@employee.FullName</td>
+                    <td>@employee.Code</td>
+                  
+                    <td>@(employee.Department?.Name.ToString() ?? "N/A")</td>
+                    <td><a href="/@employee.ID">View Details</a></td>
+                </tr>
+                count = count + 1;
+            }
+        </tbody>
+    }
+</table>
