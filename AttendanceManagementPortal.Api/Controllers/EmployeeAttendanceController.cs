@@ -67,5 +67,25 @@ namespace AttendanceManagementPortal.Api.Controllers
                 return StatusCode(500, "Error in retrieving database");
             }
         }
+        /// <summary>
+        /// Biometric data dashboard reflect
+        /// </summary>
+        /// <returns></returns>
+        //[Route("api/EmployeeAttendance/GetEmployeeAttendanceFromBiometric")]
+        [HttpGet("GetEmployeeAttendanceFromBiometric")]
+        public async Task<ActionResult> GetEmployeeAttendanceFromBiometric()
+        {
+            try
+            {
+                var result = await _employeeAttendanceRepository.GetEmployeeAttendanceFromBiometric();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error in retrieving database");
+            }
+        }
+
+
     }
 }
