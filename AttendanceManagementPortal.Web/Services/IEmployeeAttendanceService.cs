@@ -7,6 +7,7 @@ namespace AttendanceManagementPortal.Web.Services
     {
         Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendance();
         Task<AttendanceLog> GetAttendanceByEmployeeIdLastUpdate(int empid);
-        Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendanceFromBiometric();
+        Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendanceForEmployee(string email);
+        Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendanceByEmployeeId(int employeeid);
     }
 }
