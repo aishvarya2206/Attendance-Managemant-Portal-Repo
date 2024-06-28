@@ -1,4 +1,5 @@
 ﻿using AttendanceManagementPortal.Model;
+using AttendanceManagementPortal.Web.Components.Account.Pages.Manage;
 
 namespace AttendanceManagementPortal.Web.Services
 {
@@ -19,6 +20,12 @@ namespace AttendanceManagementPortal.Web.Services
         public async Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendance()
         {
             var result = await _httpClient.GetFromJsonAsync<EmployeeAttendance[]>($"api/EmployeeAttendance");
+            return result;
+        }
+
+        public async Task<IEnumerable<EmployeeAttendance>> GetEmployeeAttendanceByEmployeeId(int employeeid)
+        {
+            var result = await _httpClient.GetFromJsonAsync<EmployeeAttendance[]>($"api/EmployeeAttendance/GetEmployeeAttendanceByEmployeeId/{employeeid}");
             return result;
         }
 

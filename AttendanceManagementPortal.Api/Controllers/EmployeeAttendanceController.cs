@@ -54,5 +54,18 @@ namespace AttendanceManagementPortal.Api.Controllers
                 return StatusCode(500, "Error in retrieving database");
             }
         }
+        [HttpGet("GetEmployeeAttendanceByEmployeeId/{employeeid}")]
+        public async Task<ActionResult> GetEmployeeAttendanceByEmployeeId(int employeeid)
+        {
+            try
+            {
+                var result = await _employeeAttendanceRepository.GetEmployeeAttendanceByEmployeeId(employeeid);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error in retrieving database");
+            }
+        }
     }
 }
