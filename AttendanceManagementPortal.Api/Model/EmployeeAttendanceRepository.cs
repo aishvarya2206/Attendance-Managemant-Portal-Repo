@@ -115,12 +115,14 @@ namespace AttendanceManagementPortal.Api.Model
             
         }
         
-        public async Task<EmployeeAttendance?> GetEmployeeAttendanceByEmployeeId(int employeeId) 
+        public async Task<IEnumerable<EmployeeAttendance?>> GetEmployeeAttendanceByEmployeeId(int employeeId) 
         {
             try
             {
                 var result = await _appDbContext.EmployeesAttendances
-                                .FirstOrDefaultAsync(x => x.EmployeeID == employeeId);
+                    .Include(y => y.Employee)
+                                .Where(x => x.EmployeeID == employeeId)
+                        .ToListAsync();
                 return result;
             }
             catch (Exception e)
