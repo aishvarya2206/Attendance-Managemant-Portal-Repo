@@ -27,7 +27,7 @@ namespace AttendanceManagementPortal.Biometrics
             string csvFilePath = configuration.GetSection("csvFilePath").Value;
             // auto load every 10 min
             var startTimeSpan = TimeSpan.Zero;
-            var periodTimeSpan = TimeSpan.FromMinutes(10);
+            var periodTimeSpan = TimeSpan.FromMinutes(30);
 
             var timer = new System.Threading.Timer((e) =>
             {
