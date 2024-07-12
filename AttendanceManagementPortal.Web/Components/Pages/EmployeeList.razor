@@ -30,7 +30,7 @@
                     <td>@employee.Code</td>
                   
                     <td>@(employee.Department?.Name.ToString() ?? "N/A")</td>
-                    <td><a href="/@employee.ID">View Details</a></td>
+                    <td><a href="/dashboard/@employee.ID">View Details</a></td>
                 </tr>
                 count = count + 1;
             }
