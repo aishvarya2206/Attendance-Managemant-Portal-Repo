@@ -22,12 +22,12 @@ namespace AttendanceManagementPortal.Desktop
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             NetworkChange.NetworkAddressChanged += new NetworkAddressChangedEventHandler(AddressChangedCallback);
             Console.ReadLine();
-
         }
+
         static string GetSsid()
         {
             var wlan = new WlanClient();
