@@ -53,7 +53,9 @@ namespace AttendanceManagementPortal.Biometrics.BiometricSQL
 
                             //int AttendFound = cmdforempattend.ExecuteNonQuery();
                             // if employee attendance does not exist 
-                            if (AttendFound <= 0)
+                            int res = DateTime.Compare(record.Date, DateTime.Today);
+
+                            if (AttendFound <= 0 && res == 0)
                             {
                                 SqlCommand attendcreate = new SqlCommand();
                                 
