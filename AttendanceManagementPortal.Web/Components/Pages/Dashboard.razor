@@ -1,0 +1,45 @@
+﻿@page "/"
+@page "/{employeeid}"
+@using Microsoft.AspNetCore.Authorization
+@inherits DashboardBase;
+@attribute [Authorize]
+
+<h3>Dashboard</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Employee Name</th>
+            <th scope="col">Employee Code</th>
+            <th scope="col">Connect Time</th>
+            <th scope="col">Disconnect Time</th>
+            <th scope="col">Date</th>
+            <th scope="col">Location</th>
+            <th scope="col">Attendance</th>
+        </tr>
+    </thead>
+    @if (EmployeeAttendances != null )
+    {
+        var count = 1;
+        <tbody>
+            @foreach(var attend in EmployeeAttendances)
+            { 
+                
+                <tr>
+
+                    <th scope="row">@count</th>
+                    <td>@(attend.Employee?.FullName ?? "N/A")</td>
+                    <td>@(attend.Employee?.Code ?? "N/A")</td>
+                    <td>@attend.CheckIn</td>
+                    <td>@(attend.CheckOut)</td>
+                    <td>@attend.Date.ToShortDateString()</td>
+                    <td>@attend.Location</td>
+                    <td>Present</td>
+                </tr>
+                count = count + 1;
+            }
+        </tbody>
+    }
+    
+</table>
